@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import mongoose from 'mongoose';
 import connectDB from './config/db.js';
 import { globalErrorHandler, notFoundHandler } from './middleware/errorMiddleware.js';
+import authRoutes from './routes/authRoutes.js';
 
 // Load environment variables before initializing app modules
 dotenv.config();
@@ -57,7 +58,10 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// 6. Handle 404 Unmapped Routes
+// 6. Auth API Routes
+app.use('/api/auth', authRoutes);
+
+// 7. Handle 404 Unmapped Routes
 app.use(notFoundHandler);
 
 // 7. Centralized Global Error Handling Middleware (must be registered last)
