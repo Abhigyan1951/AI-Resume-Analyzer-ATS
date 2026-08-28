@@ -8,6 +8,7 @@ import connectDB from './config/db.js';
 import { globalErrorHandler, notFoundHandler } from './middleware/errorMiddleware.js';
 import authRoutes from './routes/authRoutes.js';
 import resumeRoutes from './routes/resumeRoutes.js';
+import atsRoutes from './routes/atsRoutes.js';
 
 // Load environment variables before initializing app modules
 dotenv.config();
@@ -62,6 +63,7 @@ app.get('/api/health', (req, res) => {
 // 6. API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/resume', resumeRoutes);
+app.use('/api/ats', atsRoutes);
 
 // 7. Handle 404 Unmapped Routes
 app.use(notFoundHandler);
