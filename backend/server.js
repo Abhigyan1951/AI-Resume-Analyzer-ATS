@@ -9,6 +9,7 @@ import { globalErrorHandler, notFoundHandler } from './middleware/errorMiddlewar
 import authRoutes from './routes/authRoutes.js';
 import resumeRoutes from './routes/resumeRoutes.js';
 import atsRoutes from './routes/atsRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
 
 // Load environment variables before initializing app modules
 dotenv.config();
@@ -64,6 +65,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/resume', resumeRoutes);
 app.use('/api/ats', atsRoutes);
+app.use('/api/ai', aiRoutes);
 
 // 7. Handle 404 Unmapped Routes
 app.use(notFoundHandler);
