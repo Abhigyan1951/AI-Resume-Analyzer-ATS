@@ -1,5 +1,6 @@
 import { processResumeUpload, getUserResumeVersions } from '../services/resumeService.js';
 import Resume from '../models/resumeModel.js';
+import asyncHandler from "../utils/asyncHandler.js";
 
 /**
  * @file resumeController.js

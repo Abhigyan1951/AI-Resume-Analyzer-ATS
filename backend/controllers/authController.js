@@ -1,5 +1,5 @@
 import { registerUser, loginUser, getUserProfile, updateUserProfile } from '../services/authService.js';
-
+import asyncHandler from "../utils/asyncHandler.js";
 /**
  * @file authController.js
  * @description Controllers for handling user authentication operations (registration, login, profile).
