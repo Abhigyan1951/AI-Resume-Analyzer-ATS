@@ -3,20 +3,20 @@
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   
-  --color-bg-dark: #0B1020;
+  --color-bg-dark: #0A0F1C;
   --color-surface-dark: #111827;
-  --color-surface-hover: #1A2235;
-  --color-border-dark: #1F2937;
+  --color-surface-hover: #161F2F;
+  --color-border-dark: #263244;
   
-  --color-brand-primary: #4F8CFF;
-  --color-brand-secondary: #7C3AED;
-  --color-brand-success: #22C55E;
-  --color-brand-warning: #F59E0B;
-  --color-brand-danger: #EF4444;
+  --color-brand-primary: #2563EB;
+  --color-brand-secondary: #0EA5E9;
+  --color-brand-success: #16A34A;
+  --color-brand-warning: #D97706;
+  --color-brand-danger: #DC2626;
 
-  --color-text-main: #F9FAFB;
-  --color-text-sub: #9CA3AF;
-  --color-text-muted: #6B7280;
+  --color-text-main: #F8FAFC;
+  --color-text-sub: #94A3B8;
+  --color-text-muted: #64748B;
 
   --radius-xs: 4px;
   --radius-sm: 8px;
@@ -25,48 +25,104 @@
   --radius-xl: 24px;
 }
 
+:root {
+  --bg-app: #0A0F1C;
+  --surface-main: #111827;
+  --surface-elevated: #161F2F;
+  --border-subtle: #263244;
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --accent-primary: #2563EB;
+  --accent-secondary: #0EA5E9;
+}
+
+html.light {
+  --bg-app: #F8FAFC;
+  --surface-main: #FFFFFF;
+  --surface-elevated: #F1F5F9;
+  --border-subtle: #CBD5E1;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --accent-primary: #2563EB;
+  --accent-secondary: #0EA5E9;
+}
+
+html.dark {
+  --bg-app: #0A0F1C;
+  --surface-main: #111827;
+  --surface-elevated: #161F2F;
+  --border-subtle: #263244;
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --accent-primary: #2563EB;
+  --accent-secondary: #0EA5E9;
+}
+
 @layer base {
   * {
-    border-color: #1F2937;
+    border-color: var(--border-subtle);
   }
   
   body {
-    background-color: #0B1020;
-    color: #F9FAFB;
+    background-color: var(--bg-app);
+    color: var(--text-primary);
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 }
 
-/* Custom Glassmorphism Utilities */
+/* Custom Semantic Utility Classes */
+.surface {
+  background-color: var(--surface-main);
+  border-color: var(--border-subtle);
+}
+
+.surface-elevated {
+  background-color: var(--surface-elevated);
+  border-color: var(--border-subtle);
+}
+
 .glass-card {
-  background: rgba(17, 24, 39, 0.75);
+  background: var(--surface-main);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(31, 41, 55, 0.8);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.25);
 }
 
 .glass-elevated {
-  background: rgba(26, 34, 53, 0.85);
+  background: var(--surface-elevated);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.35);
 }
 
 .glass-soft {
-  background: rgba(17, 24, 39, 0.45);
+  background: var(--surface-main);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(31, 41, 55, 0.5);
+  border: 1px solid var(--border-subtle);
 }
 
 .glass-nav {
-  background: rgba(11, 16, 32, 0.85);
+  background: var(--surface-main);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(31, 41, 55, 0.8);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.focus-ring {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-primary);
+}
+
+.premium-shadow {
+  box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.15);
 }
 
 /* Custom Scrollbar */
@@ -76,16 +132,16 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #0B1020;
+  background: var(--bg-app);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1F2937;
+  background: var(--border-subtle);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #374151;
+  background: var(--text-muted);
 }
 
 /* Skeleton Loading Shimmer */
@@ -101,9 +157,9 @@
 .animate-shimmer {
   background: linear-gradient(
     90deg,
-    rgba(31, 41, 55, 0.4) 25%,
-    rgba(55, 65, 81, 0.6) 50%,
-    rgba(31, 41, 55, 0.4) 75%
+    rgba(38, 50, 68, 0.4) 25%,
+    rgba(51, 65, 85, 0.6) 50%,
+    rgba(38, 50, 68, 0.4) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.8s infinite linear;

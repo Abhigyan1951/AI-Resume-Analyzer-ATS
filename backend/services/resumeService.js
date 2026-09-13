@@ -13,6 +13,8 @@ const pdf = require('pdf-parse');
  * Uses pdf-parse to extract raw text content from uploaded PDF documents.
  */
 
+import atsService from './atsService.js';
+
 /**
  * Parses PDF file content and extracts textual data
  * 
@@ -30,13 +32,27 @@ export const extractTextFromPDF = async (filePath) => {
 };
 
 /**
- * Processes an uploaded resume file: parses PDF text, creates resume record in MongoDB,
- * and returns saved metadata with a 300-character text preview.
+ * Helper: Generate Git-Style Commit Message based on newly added skills/content
+ */
+const generateCommitName = (versionNumber, newlyAddedKeywords, originalName) => {
+  if (versionNumber === 1) {
+    return `v1.0 - Initial Baseline Resume (${originalName})`;
+  }
+  if (newlyAddedKeywords && newlyAddedKeywords.length > 0) {
+    const topKeywords = newlyAddedKeywords.slice(0, 3).join(', ');
+    return `v${versionNumber}.0 - Integrated ${topKeywords}`;
+  }
+  return `v${versionNumber}.0 - Optimized Formatting & ATS Impact`;
+};
+
+/**
+ * Processes an uploaded resume file: parses PDF text, creates versioned resume record in MongoDB,
+ * calculates version deltas, and returns saved metadata with preview.
  * 
  * @param {Object} params - Processing parameters
  * @param {string} params.userId - Authenticated user MongoDB ObjectId
- * @param {Object} params.file - Multer uploaded file object (filename, originalname, path, size, etc.)
- * @returns {Promise<Object>} Object containing saved resume document and first 300 characters preview
+ * @param {Object} params.file - Multer uploaded file object
+ * @returns {Promise<Object>} Object containing saved resume document and version details
  */
 export const processResumeUpload = async ({ userId, file }) => {
   if (!file) {
@@ -53,17 +69,55 @@ export const processResumeUpload = async ({ userId, file }) => {
     );
   }
 
-  // 2. Persist resume document into MongoDB
+  // 2. Determine previous resume versions for user to calculate version number & keyword diffs
+  const previousResumes = await Resume.find({ user: userId }).sort({ createdAt: -1 });
+  const versionNumber = previousResumes.length > 0 ? previousResumes[0].versionNumber + 1 : 1;
+
+  // Run initial baseline analysis
+  const dummyJobDesc = "Software Engineer Full Stack developer JavaScript Node.js React Python Cloud CI/CD REST API SQL Docker Agile System Design";
+  const skillsAnalysis = atsService.calculateSkillsOverlap(extractedText, dummyJobDesc);
+  const expAnalysis = atsService.evaluateExperience(extractedText, dummyJobDesc);
+  const structAnalysis = atsService.detectResumeSections(extractedText);
+  
+  const currentKeywords = atsService.extractKeywords(extractedText);
+  const currentKeywordsArray = Array.from(currentKeywords);
+
+  let newlyAddedKeywords = [];
+  let removedWeaknesses = [];
+
+  if (previousResumes.length > 0 && previousResumes[0].extractedText) {
+    const prevKeywords = atsService.extractKeywords(previousResumes[0].extractedText);
+    newlyAddedKeywords = currentKeywordsArray.filter(kw => !prevKeywords.has(kw)).slice(0, 8);
+    removedWeaknesses = (previousResumes[0].missingKeywords || []).filter(kw => currentKeywords.has(kw)).slice(0, 5);
+  } else {
+    newlyAddedKeywords = currentKeywordsArray.slice(0, 5);
+  }
+
+  const keywordScore = Math.min(100, Math.round((currentKeywordsArray.length / 45) * 100));
+  const overallScore = atsService.calculateOverallScore(keywordScore, expAnalysis.experienceScore, structAnalysis.structureScore);
+  const commitName = generateCommitName(versionNumber, newlyAddedKeywords, file.originalname);
+
+  // 3. Persist resume document into MongoDB
   const resume = await Resume.create({
     user: userId,
     originalName: file.originalname,
     fileName: file.filename,
     filePath: file.path,
     extractedText,
+    versionNumber,
+    commitName,
+    atsScore: overallScore,
+    keywordScore,
+    experienceScore: expAnalysis.experienceScore,
+    structureScore: structAnalysis.structureScore,
+    targetRole: 'Full Stack Engineer',
+    matchedKeywords: skillsAnalysis.matchedSkills,
+    missingKeywords: skillsAnalysis.missingSkills,
+    newlyAddedKeywords,
+    removedWeaknesses,
     uploadDate: new Date(),
   });
 
-  // 3. Extract first 300 characters for immediate preview response
   const previewText = extractedText.slice(0, 300);
 
   return {
@@ -73,6 +127,10 @@ export const processResumeUpload = async ({ userId, file }) => {
       originalName: resume.originalName,
       fileName: resume.fileName,
       filePath: resume.filePath,
+      versionNumber: resume.versionNumber,
+      commitName: resume.commitName,
+      atsScore: resume.atsScore,
+      newlyAddedKeywords: resume.newlyAddedKeywords,
       uploadDate: resume.uploadDate,
       createdAt: resume.createdAt,
       updatedAt: resume.updatedAt,
@@ -81,7 +139,18 @@ export const processResumeUpload = async ({ userId, file }) => {
   };
 };
 
+/**
+ * Fetch all versions of a user's resumes ordered by version number descending
+ * @param {string} userId - User ObjectId
+ * @returns {Promise<Array>} Array of versioned resume objects
+ */
+export const getUserResumeVersions = async (userId) => {
+  const versions = await Resume.find({ user: userId }).sort({ versionNumber: -1 });
+  return versions;
+};
+
 export default {
   extractTextFromPDF,
   processResumeUpload,
+  getUserResumeVersions,
 };

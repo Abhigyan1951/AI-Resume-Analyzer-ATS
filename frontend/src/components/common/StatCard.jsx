@@ -5,19 +5,19 @@ import { Card } from '../ui/Card';
 import { cn } from '../../utils/cn';
 
 const colorStyles = {
-  primary: 'from-[#4F8CFF]/20 to-[#4F8CFF]/5 text-[#4F8CFF] border-[#4F8CFF]/30',
-  secondary: 'from-[#7C3AED]/20 to-[#7C3AED]/5 text-[#a78bfa] border-[#7C3AED]/30',
-  success: 'from-[#22C55E]/20 to-[#22C55E]/5 text-[#22C55E] border-[#22C55E]/30',
-  warning: 'from-[#F59E0B]/20 to-[#F59E0B]/5 text-[#F59E0B] border-[#F59E0B]/30',
-  danger: 'from-[#EF4444]/20 to-[#EF4444]/5 text-[#EF4444] border-[#EF4444]/30',
+  primary: 'from-[#2563EB]/20 to-[#2563EB]/5 text-[#2563EB] border-[#2563EB]/30',
+  secondary: 'from-[#0EA5E9]/20 to-[#0EA5E9]/5 text-[#0EA5E9] border-[#0EA5E9]/30',
+  success: 'from-[#16A34A]/20 to-[#16A34A]/5 text-[#16A34A] border-[#16A34A]/30',
+  warning: 'from-[#D97706]/20 to-[#D97706]/5 text-[#D97706] border-[#D97706]/30',
+  danger: 'from-[#DC2626]/20 to-[#DC2626]/5 text-[#DC2626] border-[#DC2626]/30',
 };
 
 const iconBg = {
-  primary: 'bg-[#4F8CFF]/15 text-[#4F8CFF]',
-  secondary: 'bg-[#7C3AED]/15 text-[#a78bfa]',
-  success: 'bg-[#22C55E]/15 text-[#22C55E]',
-  warning: 'bg-[#F59E0B]/15 text-[#F59E0B]',
-  danger: 'bg-[#EF4444]/15 text-[#EF4444]',
+  primary: 'bg-[#2563EB]/15 text-[#2563EB]',
+  secondary: 'bg-[#0EA5E9]/15 text-[#0EA5E9]',
+  success: 'bg-[#16A34A]/15 text-[#16A34A]',
+  warning: 'bg-[#D97706]/15 text-[#D97706]',
+  danger: 'bg-[#DC2626]/15 text-[#DC2626]',
 };
 
 export const StatCard = ({
@@ -42,18 +42,18 @@ export const StatCard = ({
 
       <div className="flex items-start justify-between">
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-[#9CA3AF] uppercase tracking-wider">
+          <span className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
             {title}
           </span>
           <div className="flex items-baseline gap-2">
-            <h3 className="text-3xl font-extrabold text-[#F9FAFB] tracking-tight">
+            <h3 className="text-3xl font-extrabold text-[var(--text-primary)] tracking-tight">
               {value}
             </h3>
             {trendValue && (
               <span
                 className={cn(
                   'inline-flex items-center text-xs font-semibold px-1.5 py-0.5 rounded-md',
-                  trend === 'up' ? 'text-[#22C55E] bg-[#22C55E]/10' : 'text-[#EF4444] bg-[#EF4444]/10'
+                  trend === 'up' ? 'text-[#16A34A] bg-[#16A34A]/10' : 'text-[#DC2626] bg-[#DC2626]/10'
                 )}
               >
                 {trend === 'up' ? <TrendingUp className="w-3 h-3 mr-0.5" /> : <TrendingDown className="w-3 h-3 mr-0.5" />}
@@ -71,7 +71,7 @@ export const StatCard = ({
       </div>
 
       {subtitle && (
-        <p className="text-xs text-[#9CA3AF] mt-4 pt-3 border-t border-[#1F2937]/60">
+        <p className="text-xs text-[var(--text-secondary)] mt-4 pt-3 border-t border-[var(--border-subtle)]">
           {subtitle}
         </p>
       )}

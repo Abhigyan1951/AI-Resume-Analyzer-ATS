@@ -4,11 +4,11 @@ import { Loader2 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
 const variants = {
-  primary: 'bg-[#4F8CFF] hover:bg-[#3b79ef] text-white shadow-lg shadow-[#4F8CFF]/20 border border-[#4F8CFF]/30',
-  secondary: 'bg-[#1A2235] hover:bg-[#232d44] text-[#F9FAFB] border border-[#1F2937] hover:border-[#374151]',
-  ghost: 'bg-transparent hover:bg-[#1A2235] text-[#9CA3AF] hover:text-[#F9FAFB]',
-  danger: 'bg-[#EF4444] hover:bg-[#dc2626] text-white shadow-lg shadow-[#EF4444]/20 border border-[#EF4444]/30',
-  icon: 'bg-[#111827] hover:bg-[#1A2235] text-[#9CA3AF] hover:text-[#F9FAFB] border border-[#1F2937] p-2 rounded-xl',
+  primary: 'bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-md shadow-[#2563EB]/20 border border-[#2563EB]/40',
+  secondary: 'bg-[var(--surface-elevated)] hover:bg-[var(--border-subtle)] text-[var(--text-primary)] border border-[var(--border-subtle)]',
+  ghost: 'bg-transparent hover:bg-[var(--surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]',
+  danger: 'bg-[#DC2626] hover:bg-[#B91C1C] text-white shadow-md shadow-[#DC2626]/20 border border-[#DC2626]/40',
+  icon: 'bg-[var(--surface-main)] hover:bg-[var(--surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] p-2 rounded-xl',
 };
 
 const sizes = {

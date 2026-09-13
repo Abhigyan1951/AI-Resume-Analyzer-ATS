@@ -40,6 +40,20 @@ const userSchema = new mongoose.Schema(
       },
       default: 'user',
     },
+    careerPreferences: {
+      targetRole: { type: String, default: 'Full Stack Engineer' },
+      experienceLevel: { type: String, default: 'Mid-Level (3-5 yrs)' },
+      preferredIndustry: { type: String, default: 'Software & Technology' },
+    },
+    unlockedBadges: [
+      {
+        badgeId: String,
+        name: String,
+        icon: String,
+        description: String,
+        unlockedAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true, // Automatically manages createdAt and updatedAt fields

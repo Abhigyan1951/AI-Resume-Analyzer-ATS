@@ -1,5 +1,5 @@
 import express from 'express';
-import { register, login, getProfile } from '../controllers/authController.js';
+import { register, login, getProfile, updateProfile } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { registerValidation, loginValidation } from '../middleware/authValidator.js';
 
@@ -30,5 +30,12 @@ router.post('/login', loginValidation, login);
  * @access  Private (JWT Protected)
  */
 router.get('/profile', protect, getProfile);
+
+/**
+ * @route   PUT /api/auth/profile
+ * @desc    Update authenticated user profile & preferences
+ * @access  Private (JWT Protected)
+ */
+router.put('/profile', protect, updateProfile);
 
 export default router;

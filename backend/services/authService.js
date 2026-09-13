@@ -45,6 +45,12 @@ const formatUserResponse = (user) => {
     name: user.name,
     email: user.email,
     role: user.role,
+    careerPreferences: user.careerPreferences || {
+      targetRole: 'Full Stack Engineer',
+      experienceLevel: 'Mid-Level (3-5 yrs)',
+      preferredIndustry: 'Software & Technology',
+    },
+    unlockedBadges: user.unlockedBadges || [],
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };
@@ -69,6 +75,15 @@ export const registerUser = async ({ name, email, password, role }) => {
     email,
     password,
     role: role || 'user',
+    unlockedBadges: [
+      {
+        badgeId: 'ats_pioneer',
+        name: 'ATS Pioneer',
+        icon: 'Rocket',
+        description: 'Joined ResumeAI 2.0 Career Intelligence Platform',
+        unlockedAt: new Date(),
+      },
+    ],
   });
 
   // 3. Generate JWT access token
@@ -121,5 +136,26 @@ export const getUserProfile = async (userId) => {
   if (!user) {
     throw new ApiError(404, 'User profile not found');
   }
+  return formatUserResponse(user);
+};
+
+/**
+ * Service: Update user profile and career preferences
+ */
+export const updateUserProfile = async (userId, { name, careerPreferences }) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, 'User profile not found');
+  }
+
+  if (name) user.name = name;
+  if (careerPreferences) {
+    user.careerPreferences = {
+      ...user.careerPreferences,
+      ...careerPreferences,
+    };
+  }
+
+  await user.save();
   return formatUserResponse(user);
 };

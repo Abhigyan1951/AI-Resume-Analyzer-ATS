@@ -10,6 +10,8 @@ import authRoutes from './routes/authRoutes.js';
 import resumeRoutes from './routes/resumeRoutes.js';
 import atsRoutes from './routes/atsRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import roadmapRoutes from './routes/roadmapRoutes.js';
+import interviewRoutes from './routes/interviewRoutes.js';
 
 // Load environment variables before initializing app modules
 dotenv.config();
@@ -66,6 +68,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/resume', resumeRoutes);
 app.use('/api/ats', atsRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/roadmap', roadmapRoutes);
+app.use('/api/interview', interviewRoutes);
 
 // 7. Handle 404 Unmapped Routes
 app.use(notFoundHandler);

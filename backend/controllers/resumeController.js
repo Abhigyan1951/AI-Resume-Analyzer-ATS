@@ -1,10 +1,9 @@
-import asyncHandler from '../utils/asyncHandler.js';
-import ApiError from '../utils/apiError.js';
-import { processResumeUpload } from '../services/resumeService.js';
+import { processResumeUpload, getUserResumeVersions } from '../services/resumeService.js';
+import Resume from '../models/resumeModel.js';
 
 /**
  * @file resumeController.js
- * @description Controller handling resume upload and PDF parsing HTTP requests.
+ * @description Controller handling resume upload, PDF parsing, and version history HTTP requests.
  */
 
 /**
@@ -36,6 +35,39 @@ export const uploadResume = asyncHandler(async (req, res) => {
   });
 });
 
+/**
+ * @desc    Get all uploaded resume versions for authenticated user
+ * @route   GET /api/resume/versions
+ * @access  Private (JWT Protected)
+ */
+export const getResumeVersions = asyncHandler(async (req, res) => {
+  const userId = req.user._id || req.user.id;
+  const versions = await getUserResumeVersions(userId);
+
+  res.status(200).json({
+    success: true,
+    count: versions.length,
+    data: versions,
+  });
+});
+
+/**
+ * @desc    Get latest resume for authenticated user
+ * @route   GET /api/resume/latest
+ * @access  Private (JWT Protected)
+ */
+export const getLatestResume = asyncHandler(async (req, res) => {
+  const userId = req.user._id || req.user.id;
+  const latestResume = await Resume.findOne({ user: userId }).sort({ createdAt: -1 });
+
+  res.status(200).json({
+    success: true,
+    data: latestResume || null,
+  });
+});
+
 export default {
   uploadResume,
+  getResumeVersions,
+  getLatestResume,
 };

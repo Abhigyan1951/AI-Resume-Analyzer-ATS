@@ -45,10 +45,10 @@ export const Input = React.forwardRef(
             ref={ref}
             type={computedType}
             className={cn(
-              'w-full bg-[#111827] border border-[#1F2937] text-[#F9FAFB] placeholder-[#6B7280] text-sm rounded-xl py-2.5 px-4 transition-all duration-200 focus:outline-none focus:border-[#4F8CFF] focus:ring-2 focus:ring-[#4F8CFF]/20 disabled:opacity-50 disabled:cursor-not-allowed',
+              'w-full bg-[var(--surface-main)] border border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-muted)] text-sm rounded-xl py-2.5 px-4 transition-all duration-200 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 disabled:opacity-50 disabled:cursor-not-allowed',
               (leftIcon || isSearch) && 'pl-10',
               (rightIcon || isPassword) && 'pr-10',
-              error && 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]/20',
+              error && 'border-[#DC2626] focus:border-[#DC2626] focus:ring-[#DC2626]/20',
               className
             )}
             {...props}

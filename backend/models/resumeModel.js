@@ -33,6 +33,56 @@ const resumeSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Extracted resume text content is required'],
     },
+    versionNumber: {
+      type: Number,
+      default: 1,
+    },
+    commitName: {
+      type: String,
+      default: 'Initial Upload',
+      trim: true,
+    },
+    atsScore: {
+      type: Number,
+      default: 0,
+    },
+    keywordScore: {
+      type: Number,
+      default: 0,
+    },
+    experienceScore: {
+      type: Number,
+      default: 0,
+    },
+    structureScore: {
+      type: Number,
+      default: 0,
+    },
+    targetRole: {
+      type: String,
+      default: 'Full Stack Engineer',
+      trim: true,
+    },
+    matchedKeywords: {
+      type: [String],
+      default: [],
+    },
+    missingKeywords: {
+      type: [String],
+      default: [],
+    },
+    newlyAddedKeywords: {
+      type: [String],
+      default: [],
+    },
+    removedWeaknesses: {
+      type: [String],
+      default: [],
+    },
+    aiRewriteSnapshot: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
     uploadDate: {
       type: Date,
       default: Date.now,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   FileCheck2,
@@ -10,6 +10,13 @@ import {
   Clock,
   ExternalLink,
   Zap,
+  TrendingUp,
+  Award,
+  Compass,
+  MessageSquare,
+  User,
+  UserCheck,
+  Flame,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -26,304 +33,286 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../co
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { useNavigate } from 'react-router-dom';
+import { getResumesHistory } from '../services/resumeService';
+import { useTheme } from '../hooks/useTheme';
+
+import VersionTimeline from '../components/version/VersionTimeline';
+import RecruiterHeatmap from '../components/ats/RecruiterHeatmap';
+import BenchmarkRadar from '../components/benchmark/BenchmarkRadar';
+import AchievementBadges from '../components/badges/AchievementBadges';
 
 const chartData = [
-  { name: 'Mon', score: 65, keywords: 55 },
-  { name: 'Tue', score: 72, keywords: 68 },
-  { name: 'Wed', score: 70, keywords: 65 },
-  { name: 'Thu', score: 81, keywords: 84 },
-  { name: 'Fri', score: 84, keywords: 92 },
-  { name: 'Sat', score: 88, keywords: 90 },
-  { name: 'Sun', score: 94, keywords: 95 },
+  { name: 'v1.0', score: 58, keywords: 60, structure: 70 },
+  { name: 'v1.1', score: 68, keywords: 70, structure: 75 },
+  { name: 'v2.0', score: 78, keywords: 82, structure: 85 },
+  { name: 'v2.1', score: 84, keywords: 88, structure: 90 },
+  { name: 'v3.0', score: 89, keywords: 92, structure: 94 },
 ];
 
-const recentResumes = [
-  {
-    id: 'res-1',
-    name: 'Senior_FullStack_Engineer_2026.pdf',
-    date: '2 hours ago',
-    score: 94,
-    status: 'Optimized',
-    match: 'Full Stack Engineer @ Vercel',
-  },
-  {
-    id: 'res-2',
-    name: 'Frontend_Lead_Resume_v2.pdf',
-    date: '1 day ago',
-    score: 82,
-    status: 'Needs Review',
-    match: 'Frontend Tech Lead @ Stripe',
-  },
-  {
-    id: 'res-3',
-    name: 'Software_Architect_Draft.pdf',
-    date: '3 days ago',
-    score: 68,
-    status: 'Low Match',
-    match: 'Principal Architect @ AWS',
-  },
-];
+const CircularScoreGauge = ({ score = 86, label = "Career Intel Score", size = 160, strokeWidth = 14 }) => {
+  const center = size / 2;
+  const radius = center - strokeWidth;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (score / 100) * circumference;
+
+  const getScoreColor = (val) => {
+    if (val >= 80) return '#16A34A';
+    if (val >= 60) return '#D97706';
+    return '#DC2626';
+  };
+
+  const strokeColor = getScoreColor(score);
+
+  return (
+    <div className="relative inline-flex items-center justify-center">
+      <svg width={size} height={size} className="transform -rotate-90">
+        <circle
+          cx={center}
+          cy={center}
+          r={radius}
+          stroke="var(--border-subtle)"
+          strokeWidth={strokeWidth}
+          fill="transparent"
+        />
+        <motion.circle
+          cx={center}
+          cy={center}
+          r={radius}
+          stroke={strokeColor}
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          strokeDasharray={circumference}
+          initial={{ strokeDashoffset: circumference }}
+          animate={{ strokeDashoffset: offset }}
+          transition={{ duration: 1.2, ease: 'easeOut' }}
+          strokeLinecap="round"
+        />
+      </svg>
+      <div className="absolute flex flex-col items-center justify-center text-center">
+        <motion.span
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-3xl font-extrabold tracking-tight text-[var(--text-primary)]"
+        >
+          {score}
+        </motion.span>
+        <span className="text-[10px] uppercase font-bold tracking-wider text-[var(--text-secondary)]">
+          {label}
+        </span>
+      </div>
+    </div>
+  );
+};
 
 export const Dashboard = () => {
   const navigate = useNavigate();
+  const { isDark } = useTheme();
+  const [resumes, setResumes] = useState([]);
+  const [viewMode, setViewMode] = useState('candidate'); // 'candidate' | 'recruiter'
+
+  // Composite Career Intelligence Score Formula:
+  // (ATS Match * 0.35 + Skill Readiness * 0.25 + Interview Readiness * 0.25 + Roadmap Progress * 0.15)
+  const atsScore = 89;
+  const skillReadiness = 85;
+  const interviewReadiness = 78;
+  const roadmapProgress = 67;
+
+  const careerIntelScore = Math.round(
+    atsScore * 0.35 + skillReadiness * 0.25 + interviewReadiness * 0.25 + roadmapProgress * 0.15
+  );
+
+  useEffect(() => {
+    const history = getResumesHistory();
+    if (history.length > 0) {
+      setResumes(history);
+    } else {
+      setResumes([
+        {
+          id: 'res-3',
+          originalName: 'Senior_FullStack_v3.pdf',
+          versionNumber: 3,
+          commitName: 'v3.0 - Integrated Docker, CI/CD & AWS',
+          uploadedAt: 'Today',
+          score: 89,
+          match: 'Full Stack Engineer @ Vercel',
+        },
+        {
+          id: 'res-2',
+          originalName: 'FullStack_Developer_v2.pdf',
+          versionNumber: 2,
+          commitName: 'v2.0 - Added Quantified Impact Bullets',
+          uploadedAt: '3 days ago',
+          score: 78,
+          match: 'Frontend Tech Lead @ Stripe',
+        },
+        {
+          id: 'res-1',
+          originalName: 'Resume_Baseline_v1.pdf',
+          versionNumber: 1,
+          commitName: 'v1.0 - Initial Resume Upload',
+          uploadedAt: '1 week ago',
+          score: 58,
+          match: 'Software Architect @ SaaS',
+        },
+      ]);
+    }
+  }, []);
 
   return (
-    <div className="space-y-8">
-      {/* Page Header */}
-      <PageHeader
-        title="ATS Optimization Dashboard"
-        subtitle="Track your resume performance, keyword match density, and AI recommendations in real-time."
-        badge="Live Analytics"
-        action={
-          <Button onClick={() => navigate('/upload')} leftIcon={<UploadCloud className="w-4 h-4" />}>
-            Upload Resume
-          </Button>
-        }
-      />
+    <div className="space-y-8 pb-12">
+      {/* Top Header with Mode Toggle */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <PageHeader
+          title="Career Intelligence Platform 2.0"
+          subtitle="Comprehensive candidate scoring, version growth, interview readiness, and recruiter signal heatmap."
+          badge="Enterprise Suite"
+          action={
+            <Button onClick={() => navigate('/upload')} leftIcon={<UploadCloud className="w-4 h-4" />}>
+              Upload Resume v4.0
+            </Button>
+          }
+        />
 
-      {/* 4 Metric Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title="ATS Match Score"
-          value="84%"
-          subtitle="+12% higher than industry average"
-          icon={FileCheck2}
-          trend="up"
-          trendValue="14%"
-          color="primary"
-        />
-        <StatCard
-          title="Resumes Uploaded"
-          value="3 Files"
-          subtitle="Latest: Senior_FullStack_Engineer.pdf"
-          icon={FileText}
-          trend="up"
-          trendValue="1 new"
-          color="success"
-        />
-        <StatCard
-          title="Keywords Matched"
-          value="92%"
-          subtitle="18 of 20 required skills identified"
-          icon={Target}
-          trend="up"
-          trendValue="8%"
-          color="secondary"
-        />
-        <StatCard
-          title="AI Suggestions"
-          value="14 Actions"
-          subtitle="4 high-priority bullet rewrites"
-          icon={Sparkles}
-          color="warning"
-        />
+        {/* Global Candidate / Recruiter View Toggle */}
+        <div className="flex items-center bg-slate-900 p-1.5 rounded-xl border border-slate-800 self-start md:self-auto">
+          <button
+            onClick={() => setViewMode('candidate')}
+            className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition flex items-center gap-1.5 ${
+              viewMode === 'candidate' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <User className="w-4 h-4" />
+            Candidate View
+          </button>
+          <button
+            onClick={() => setViewMode('recruiter')}
+            className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition flex items-center gap-1.5 ${
+              viewMode === 'recruiter' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <UserCheck className="w-4 h-4" />
+            Recruiter View
+          </button>
+        </div>
       </div>
 
-      {/* Analytics Chart & Quick Actions Grid */}
+      {/* Hero Composite Score & Key Metric Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recharts Performance Area Chart */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <div>
-              <CardTitle>ATS Score Progression</CardTitle>
-              <CardDescription>
-                Weekly trend showing keyword coverage and match efficiency across job applications.
-              </CardDescription>
-            </div>
-            <Badge variant="primary">7 Day Trend</Badge>
-          </CardHeader>
-          <CardContent className="h-72 w-full pt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="scoreColor" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4F8CFF" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#4F8CFF" stopOpacity={0.0} />
-                  </linearGradient>
-                  <linearGradient id="keywordColor" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#7C3AED" stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" opacity={0.6} />
-                <XAxis dataKey="name" stroke="#9CA3AF" fontSize={12} tickLine={false} />
-                <YAxis stroke="#9CA3AF" fontSize={12} tickLine={false} domain={[0, 100]} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#111827',
-                    borderColor: '#1F2937',
-                    borderRadius: '12px',
-                    color: '#F9FAFB',
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="score"
-                  stroke="#4F8CFF"
-                  strokeWidth={2.5}
-                  fillOpacity={1}
-                  fill="url(#scoreColor)"
-                  name="ATS Score %"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="keywords"
-                  stroke="#7C3AED"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#keywordColor)"
-                  name="Keyword Coverage %"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </CardContent>
+        {/* Master Career Intelligence Score Card */}
+        <Card className="flex flex-col items-center justify-center p-6 text-center space-y-4 bg-gradient-to-b from-blue-950/20 to-transparent">
+          <div className="flex items-center gap-2 mb-1">
+            <Zap className="w-5 h-5 text-blue-400" />
+            <h3 className="text-base font-bold text-[var(--text-primary)]">Career Intelligence Score</h3>
+          </div>
+          <CircularScoreGauge score={careerIntelScore} label="Master Score" />
+          <div className="text-xs text-[var(--text-secondary)] max-w-xs space-y-1">
+            <p>
+              Composite rating of <span className="text-emerald-400 font-bold">ATS (35%)</span>, <span className="text-blue-400 font-bold">Skills (25%)</span>, <span className="text-purple-400 font-bold">Interview (25%)</span>, & <span className="text-amber-400 font-bold">Roadmap (15%)</span>.
+            </p>
+          </div>
         </Card>
 
-        {/* Quick Action Hub */}
-        <Card className="flex flex-col justify-between">
+        {/* 4 Core Stat Cards */}
+        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <StatCard
+            title="Current ATS Score (v3.0)"
+            value={`${atsScore}%`}
+            subtitle="+31 Pts overall growth since v1.0"
+            icon={FileCheck2}
+            trend="up"
+            trendValue="31%"
+            color="primary"
+          />
+          <StatCard
+            title="Skill Match Readiness"
+            value={`${skillReadiness}%`}
+            subtitle="Matched 18 of 20 target role skills"
+            icon={Target}
+            trend="up"
+            trendValue="85%"
+            color="success"
+          />
+          <StatCard
+            title="Interview Prep Readiness"
+            value={`${interviewReadiness}%`}
+            subtitle="5 Personalized HR & Tech sets ready"
+            icon={MessageSquare}
+            trend="up"
+            trendValue="Ready"
+            color="secondary"
+          />
+          <StatCard
+            title="90-Day Roadmap Progress"
+            value={`${roadmapProgress}%`}
+            subtitle="4 of 6 milestones completed"
+            icon={Compass}
+            color="warning"
+          />
+        </div>
+      </div>
+
+      {/* Flagship Feature 1 — Resume Version Intelligence */}
+      <VersionTimeline versions={resumes} onSelectVersion={(v) => navigate('/ats-analysis')} />
+
+      {/* Flagship Feature 4 — Recruiter Heatmap */}
+      <RecruiterHeatmap candidateViewMode={viewMode} onToggleMode={() => setViewMode(v => v === 'candidate' ? 'recruiter' : 'candidate')} />
+
+      {/* Bonus Feature — Smart Benchmark Radar */}
+      <BenchmarkRadar />
+
+      {/* Quick Action Navigation Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card
+          onClick={() => navigate('/roadmap')}
+          className="p-6 cursor-pointer hover:border-blue-500/50 transition-all space-y-3 group"
+        >
+          <div className="p-3 rounded-2xl bg-blue-600/20 text-blue-400 w-fit border border-blue-500/30">
+            <Compass className="w-6 h-6" />
+          </div>
           <div>
-            <CardHeader>
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-[#4F8CFF]" />
-                  Quick Actions
-                </CardTitle>
-                <CardDescription>Instant workflows to boost your application</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3 pt-2">
-              <div
-                onClick={() => navigate('/upload')}
-                className="p-3.5 rounded-xl glass-soft hover:bg-[#1A2235] border border-[#1F2937] transition-all cursor-pointer flex items-center justify-between group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-[#4F8CFF]/15 text-[#4F8CFF]">
-                    <UploadCloud className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h5 className="text-sm font-semibold text-[#F9FAFB]">Upload PDF Resume</h5>
-                    <p className="text-xs text-[#9CA3AF]">Extract text & validate structure</p>
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 text-[#9CA3AF] group-hover:translate-x-1 transition-transform" />
-              </div>
+            <h4 className="text-base font-bold text-white group-hover:text-blue-400 transition">AI Career Roadmap</h4>
+            <p className="text-xs text-slate-400 mt-1">Notion-style 7d, 30d, 60d, and 90d actionable growth milestones with interactive checkboxes.</p>
+          </div>
+          <div className="flex items-center text-xs font-semibold text-blue-400 gap-1 pt-1">
+            Open Roadmap <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition" />
+          </div>
+        </Card>
 
-              <div
-                onClick={() => navigate('/ats-analysis')}
-                className="p-3.5 rounded-xl glass-soft hover:bg-[#1A2235] border border-[#1F2937] transition-all cursor-pointer flex items-center justify-between group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-[#7C3AED]/15 text-[#a78bfa]">
-                    <FileCheck2 className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h5 className="text-sm font-semibold text-[#F9FAFB]">Run ATS Keyword Match</h5>
-                    <p className="text-xs text-[#9CA3AF]">Compare against job description</p>
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 text-[#9CA3AF] group-hover:translate-x-1 transition-transform" />
-              </div>
+        <Card
+          onClick={() => navigate('/interview-prep')}
+          className="p-6 cursor-pointer hover:border-purple-500/50 transition-all space-y-3 group"
+        >
+          <div className="p-3 rounded-2xl bg-purple-600/20 text-purple-400 w-fit border border-purple-500/30">
+            <MessageSquare className="w-6 h-6" />
+          </div>
+          <div>
+            <h4 className="text-base font-bold text-white group-hover:text-purple-400 transition">Interview Preparation Hub</h4>
+            <p className="text-xs text-slate-400 mt-1">Personalized HR, Technical, and Resume questions with interactive AI Mock Simulator.</p>
+          </div>
+          <div className="flex items-center text-xs font-semibold text-purple-400 gap-1 pt-1">
+            Launch Mock Interview <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition" />
+          </div>
+        </Card>
 
-              <div
-                onClick={() => navigate('/ai-rewrite')}
-                className="p-3.5 rounded-xl glass-soft hover:bg-[#1A2235] border border-[#1F2937] transition-all cursor-pointer flex items-center justify-between group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-[#22C55E]/15 text-[#22C55E]">
-                    <Sparkles className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h5 className="text-sm font-semibold text-[#F9FAFB]">Generate AI Bullet Points</h5>
-                    <p className="text-xs text-[#9CA3AF]">Google XYZ formula rewrites</p>
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 text-[#9CA3AF] group-hover:translate-x-1 transition-transform" />
-              </div>
-            </CardContent>
+        <Card
+          onClick={() => navigate('/ai-rewrite')}
+          className="p-6 cursor-pointer hover:border-emerald-500/50 transition-all space-y-3 group"
+        >
+          <div className="p-3 rounded-2xl bg-emerald-600/20 text-emerald-400 w-fit border border-emerald-500/30">
+            <Sparkles className="w-6 h-6" />
+          </div>
+          <div>
+            <h4 className="text-base font-bold text-white group-hover:text-emerald-400 transition">AI Google XYZ Rewriter</h4>
+            <p className="text-xs text-slate-400 mt-1">Transform weak resume bullet points into high-impact quantified metric achievements.</p>
+          </div>
+          <div className="flex items-center text-xs font-semibold text-emerald-400 gap-1 pt-1">
+            Rewrite Bullets <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition" />
           </div>
         </Card>
       </div>
 
-      {/* Recent Resumes Table Section */}
-      <Card>
-        <CardHeader>
-          <div>
-            <CardTitle>Recent Analyzed Resumes</CardTitle>
-            <CardDescription>Manage and review your recently parsed PDF documents</CardDescription>
-          </div>
-          <Button variant="ghost" size="sm" onClick={() => navigate('/history')}>
-            View All History
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-[#F9FAFB]">
-              <thead className="text-xs text-[#9CA3AF] uppercase bg-[#1A2235]/40 border-b border-[#1F2937]">
-                <tr>
-                  <th className="px-4 py-3 font-semibold">Document Name</th>
-                  <th className="px-4 py-3 font-semibold">Target Job Match</th>
-                  <th className="px-4 py-3 font-semibold">ATS Score</th>
-                  <th className="px-4 py-3 font-semibold">Status</th>
-                  <th className="px-4 py-3 font-semibold">Uploaded</th>
-                  <th className="px-4 py-3 font-semibold text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#1F2937]/60">
-                {recentResumes.map((res) => (
-                  <tr key={res.id} className="hover:bg-[#1A2235]/40 transition-colors">
-                    <td className="px-4 py-3.5 font-medium flex items-center gap-2.5">
-                      <FileText className="w-4 h-4 text-[#4F8CFF]" />
-                      <span className="truncate max-w-xs">{res.name}</span>
-                    </td>
-                    <td className="px-4 py-3.5 text-[#9CA3AF]">{res.match}</td>
-                    <td className="px-4 py-3.5">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                          res.score >= 85
-                            ? 'bg-[#22C55E]/15 text-[#22C55E]'
-                            : res.score >= 70
-                            ? 'bg-[#F59E0B]/15 text-[#F59E0B]'
-                            : 'bg-[#EF4444]/15 text-[#EF4444]'
-                        }`}
-                      >
-                        {res.score}%
-                      </span>
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <Badge
-                        variant={
-                          res.status === 'Optimized'
-                            ? 'success'
-                            : res.status === 'Needs Review'
-                            ? 'warning'
-                            : 'danger'
-                        }
-                        dot
-                      >
-                        {res.status}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-3.5 text-[#9CA3AF] flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-[#6B7280]" />
-                      {res.date}
-                    </td>
-                    <td className="px-4 py-3.5 text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => navigate('/ats-analysis')}
-                        rightIcon={<ExternalLink className="w-3.5 h-3.5" />}
-                      >
-                        Analyze
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Refinement 4 — Achievement Badges Grid */}
+      <AchievementBadges currentAtsScore={atsScore} />
     </div>
   );
 };

@@ -1,5 +1,4 @@
-import asyncHandler from '../utils/asyncHandler.js';
-import { registerUser, loginUser, getUserProfile } from '../services/authService.js';
+import { registerUser, loginUser, getUserProfile, updateUserProfile } from '../services/authService.js';
 
 /**
  * @file authController.js
@@ -55,3 +54,30 @@ export const getProfile = asyncHandler(async (req, res) => {
     },
   });
 });
+
+/**
+ * @desc    Update authenticated user profile and career preferences
+ * @route   PUT /api/auth/profile
+ * @access  Private
+ */
+export const updateProfile = asyncHandler(async (req, res) => {
+  const userId = req.user._id || req.user.id;
+  const { name, careerPreferences } = req.body;
+
+  const user = await updateUserProfile(userId, { name, careerPreferences });
+
+  res.status(200).json({
+    success: true,
+    message: 'User profile updated successfully',
+    data: {
+      user,
+    },
+  });
+});
+
+export default {
+  register,
+  login,
+  getProfile,
+  updateProfile,
+};
