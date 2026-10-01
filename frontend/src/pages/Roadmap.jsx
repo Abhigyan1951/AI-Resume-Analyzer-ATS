@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Compass, CheckSquare, Square, Clock, ArrowRight, ExternalLink, Sparkles, AlertCircle, RefreshCw, Layers, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
-import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
+import api from '../services/api';
+import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../hooks/useToast';
 
 export default function Roadmap() {
-  const { token, user } = useAuth();
-  const { showToast } = useToast();
+  const { user } = useAuth();
+  const toast = useToast();
 
   const [roadmap, setRoadmap] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,9 +18,7 @@ export default function Roadmap() {
   const fetchRoadmap = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:5000/api/roadmap', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get('/roadmap');
       if (res.data?.success) {
         setRoadmap(res.data.data);
       }
@@ -32,10 +30,8 @@ export default function Roadmap() {
   };
 
   useEffect(() => {
-    if (token) {
-      fetchRoadmap();
-    }
-  }, [token]);
+    fetchRoadmap();
+  }, []);
 
   const handleToggleMilestone = async (milestoneId) => {
     if (!roadmap) return;
@@ -49,18 +45,14 @@ export default function Roadmap() {
 
       setRoadmap({ ...roadmap, milestones: updatedMilestones, overallProgress });
 
-      const res = await axios.patch(
-        `http://localhost:5000/api/roadmap/${roadmap._id}/milestone/${milestoneId}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.patch(`/roadmap/${roadmap._id}/milestone/${milestoneId}`);
       if (res.data?.success) {
         setRoadmap(res.data.data);
-        showToast('Milestone status updated!', 'success');
+        toast.success('Milestone status updated!', 'Updated');
       }
     } catch (err) {
       console.error('Error toggling milestone:', err);
-      showToast('Failed to update milestone', 'error');
+      toast.error('Failed to update milestone', 'Error');
       fetchRoadmap();
     }
   };
@@ -68,18 +60,16 @@ export default function Roadmap() {
   const handleRegenerate = async () => {
     try {
       setGenerating(true);
-      const res = await axios.post(
-        'http://localhost:5000/api/roadmap/generate',
-        { targetRole: user?.careerPreferences?.targetRole || 'Full Stack Engineer' },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.post('/roadmap/generate', {
+        targetRole: user?.careerPreferences?.targetRole || 'Full Stack Engineer',
+      });
       if (res.data?.success) {
         setRoadmap(res.data.data);
-        showToast('Generated fresh AI Career Roadmap!', 'success');
+        toast.success('Generated fresh AI Career Roadmap!', 'Roadmap Ready');
       }
     } catch (err) {
       console.error('Regenerate error:', err);
-      showToast('Failed to regenerate roadmap', 'error');
+      toast.error('Failed to regenerate roadmap', 'Error');
     } finally {
       setGenerating(false);
     }

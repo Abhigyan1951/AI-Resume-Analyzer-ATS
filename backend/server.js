@@ -12,6 +12,7 @@ import atsRoutes from './routes/atsRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import roadmapRoutes from './routes/roadmapRoutes.js';
 import interviewRoutes from './routes/interviewRoutes.js';
+import versionRoutes from './routes/versionRoutes.js';
 
 // Load environment variables before initializing app modules
 dotenv.config();
@@ -26,10 +27,30 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 // 1. Security Middleware - Helmet HTTP Headers
 app.use(helmet());
 
-// 2. CORS Middleware - Restrict origin access to configured client URL
+// 2. CORS Middleware - Dynamic origin resolution for local dev & Vercel deployment
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',').map((url) => url.trim().replace(/\/$/, ''))
+  : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'];
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, Postman, server-to-server)
+      if (!origin) return callback(null, true);
+      const normalizedOrigin = origin.replace(/\/$/, '');
+      if (
+        allowedOrigins.includes(normalizedOrigin) ||
+        allowedOrigins.includes('*') ||
+        NODE_ENV !== 'production'
+      ) {
+        return callback(null, true);
+      }
+      // Allow Vercel preview domains if matches vercel.app
+      if (normalizedOrigin.endsWith('.vercel.app')) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -70,6 +91,7 @@ app.use('/api/ats', atsRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/roadmap', roadmapRoutes);
 app.use('/api/interview', interviewRoutes);
+app.use('/api/versions', versionRoutes);
 
 // 7. Handle 404 Unmapped Routes
 app.use(notFoundHandler);

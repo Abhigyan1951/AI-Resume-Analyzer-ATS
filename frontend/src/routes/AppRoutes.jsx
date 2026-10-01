@@ -8,6 +8,9 @@ import Dashboard from '../pages/Dashboard';
 import UploadResume from '../pages/UploadResume';
 import ATSAnalysis from '../pages/ATSAnalysis';
 import AIRewrite from '../pages/AIRewrite';
+import Roadmap from '../pages/Roadmap';
+import InterviewPrep from '../pages/InterviewPrep';
+import VersionHistory from '../pages/VersionHistory';
 import History from '../pages/History';
 import Settings from '../pages/Settings';
 import NotFound from '../pages/NotFound';
@@ -33,6 +36,9 @@ export const AppRoutes = () => {
           <Route path="/upload" element={<UploadResume />} />
           <Route path="/ats-analysis" element={<ATSAnalysis />} />
           <Route path="/ai-rewrite" element={<AIRewrite />} />
+          <Route path="/version-history" element={<VersionHistory />} />
+          <Route path="/roadmap" element={<Roadmap />} />
+          <Route path="/interview-prep" element={<InterviewPrep />} />
           <Route path="/history" element={<History />} />
           <Route path="/settings" element={<Settings />} />
         </Route>

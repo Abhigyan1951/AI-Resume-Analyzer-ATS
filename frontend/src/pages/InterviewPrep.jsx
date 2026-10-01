@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, Sparkles, CheckCircle2, RefreshCw, Eye, EyeOff, Award, HelpCircle, Send, Play, ShieldAlert, Zap } from 'lucide-react';
-import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
+import api from '../services/api';
+import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../hooks/useToast';
 
 export default function InterviewPrep() {
-  const { token, user } = useAuth();
-  const { showToast } = useToast();
+  const { user } = useAuth();
+  const toast = useToast();
 
   const [interviewData, setInterviewData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,9 +25,7 @@ export default function InterviewPrep() {
   const fetchInterviewPrep = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:5000/api/interview', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get('/interview');
       if (res.data?.success) {
         setInterviewData(res.data.data);
       }
@@ -39,10 +37,8 @@ export default function InterviewPrep() {
   };
 
   useEffect(() => {
-    if (token) {
-      fetchInterviewPrep();
-    }
-  }, [token]);
+    fetchInterviewPrep();
+  }, []);
 
   const handleToggleReveal = (id) => {
     setRevealedAnswers((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -56,18 +52,14 @@ export default function InterviewPrep() {
       );
       setInterviewData({ ...interviewData, questions: updatedQuestions });
 
-      const res = await axios.patch(
-        `http://localhost:5000/api/interview/${interviewData._id}/question/${questionId}/mastered`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.patch(`/interview/${interviewData._id}/question/${questionId}/mastered`);
       if (res.data?.success) {
         setInterviewData(res.data.data);
-        showToast('Question status updated!', 'success');
+        toast.success('Question status updated!', 'Updated');
       }
     } catch (err) {
       console.error('Toggle error:', err);
-      showToast('Failed to update question status', 'error');
+      toast.error('Failed to update question status', 'Error');
       fetchInterviewPrep();
     }
   };
@@ -75,18 +67,16 @@ export default function InterviewPrep() {
   const handleRegenerate = async () => {
     try {
       setGenerating(true);
-      const res = await axios.post(
-        'http://localhost:5000/api/interview/generate',
-        { targetRole: user?.careerPreferences?.targetRole || 'Full Stack Engineer' },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.post('/interview/generate', {
+        targetRole: user?.careerPreferences?.targetRole || 'Full Stack Engineer',
+      });
       if (res.data?.success) {
         setInterviewData(res.data.data);
-        showToast('Generated fresh personalized interview set!', 'success');
+        toast.success('Generated fresh personalized interview set!', 'Interview Prep Ready');
       }
     } catch (err) {
       console.error('Regenerate error:', err);
-      showToast('Failed to regenerate interview set', 'error');
+      toast.error('Failed to regenerate interview set', 'Error');
     } finally {
       setGenerating(false);
     }
@@ -94,7 +84,7 @@ export default function InterviewPrep() {
 
   const handleMockSubmit = async () => {
     if (!mockAnswer.trim()) {
-      showToast('Please type your response before submitting.', 'warning');
+      toast.warning('Please type your response before submitting.', 'Input Required');
       return;
     }
     const currentQ = questions[mockIndex];
@@ -103,22 +93,18 @@ export default function InterviewPrep() {
     try {
       setEvaluating(true);
       setMockFeedback(null);
-      const res = await axios.post(
-        'http://localhost:5000/api/interview/mock-eval',
-        {
-          question: currentQ.question,
-          userAnswer: mockAnswer,
-          expectedAnswer: currentQ.expectedAnswer,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.post('/interview/mock-eval', {
+        question: currentQ.question,
+        userAnswer: mockAnswer,
+        expectedAnswer: currentQ.expectedAnswer,
+      });
       if (res.data?.success) {
         setMockFeedback(res.data.data);
-        showToast('AI Mock Interview Evaluation Complete!', 'success');
+        toast.success('AI Mock Interview Evaluation Complete!', 'Evaluation Ready');
       }
     } catch (err) {
       console.error('Mock eval error:', err);
-      showToast('Failed to evaluate answer', 'error');
+      toast.error('Failed to evaluate answer', 'Error');
     } finally {
       setEvaluating(false);
     }

@@ -14,6 +14,7 @@ const pdf = require('pdf-parse');
  */
 
 import atsService from './atsService.js';
+import { createVersionSnapshot } from './versionService.js';
 
 /**
  * Parses PDF file content and extracts textual data
@@ -117,6 +118,20 @@ export const processResumeUpload = async ({ userId, file }) => {
     removedWeaknesses,
     uploadDate: new Date(),
   });
+
+  // Also persist to ResumeVersion history model
+  try {
+    await createVersionSnapshot({
+      userId,
+      resumeId: resume._id,
+      versionLabel: commitName,
+      changesSummary: commitName,
+      newlyAddedKeywords,
+      removedWeaknesses,
+    });
+  } catch (err) {
+    console.warn('[resumeService] Auto version snapshot warning:', err.message);
+  }
 
   const previewText = extractedText.slice(0, 300);
 

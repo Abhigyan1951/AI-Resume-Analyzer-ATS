@@ -16,6 +16,7 @@ import {
   User as UserIcon,
   Compass,
   MessageSquare,
+  GitCommit,
 } from 'lucide-react';
 import { useSidebar } from '../../hooks/useSidebar';
 import { useAuth } from '../../hooks/useAuth';
@@ -24,6 +25,7 @@ import { cn } from '../../utils/cn';
 
 const navItems = [
   { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+  { label: 'Version Intelligence', path: '/version-history', icon: GitCommit, badge: 'GIT' },
   { label: 'AI Roadmap', path: '/roadmap', icon: Compass, badge: 'NEW' },
   { label: 'Interview Prep', path: '/interview-prep', icon: MessageSquare, badge: 'AI' },
   { label: 'Upload Resume', path: '/upload', icon: UploadCloud },

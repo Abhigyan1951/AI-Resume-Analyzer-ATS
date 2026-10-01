@@ -9,7 +9,7 @@ import { Badge } from '../components/ui/Badge';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { useTheme } from '../hooks/useTheme';
-import axios from 'axios';
+import api from '../services/api';
 
 export const Settings = () => {
   const { user, logout, token } = useAuth();
@@ -43,20 +43,14 @@ export const Settings = () => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      if (token) {
-        await axios.put(
-          'http://localhost:5000/api/auth/profile',
-          {
-            name,
-            careerPreferences: {
-              targetRole,
-              experienceLevel,
-              preferredIndustry,
-            },
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      }
+      await api.put('/auth/profile', {
+        name,
+        careerPreferences: {
+          targetRole,
+          experienceLevel,
+          preferredIndustry,
+        },
+      });
       toast.success('Career preferences & profile saved successfully!', 'Settings Updated');
     } catch (err) {
       console.error('Save settings error:', err);
@@ -256,7 +250,7 @@ export const Settings = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label="API Base URL"
-              defaultValue="http://localhost:5000/api"
+              defaultValue={import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api"}
               readOnly
               helperText="Connected & authenticated with JWT Bearer storage"
             />
