@@ -240,8 +240,7 @@ export const rewriteResumeAI = async ({
 
   const genAI = new GoogleGenerativeAI(apiKey);
 
-  const modelName =
-    process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+  const modelName = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
 
   const model = genAI.getGenerativeModel({
     model: modelName,
