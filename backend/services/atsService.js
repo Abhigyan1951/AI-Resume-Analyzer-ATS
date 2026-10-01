@@ -443,6 +443,7 @@ export const analyzeResumeATS = async ({ resumeId, jobDescription, userId }) => 
 
 export default {
   analyzeResumeATS,
+  extractKeywords,
   calculateKeywordMatch,
   calculateSkillsOverlap,
   evaluateExperience,
