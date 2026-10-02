@@ -28,9 +28,8 @@ export const TopNav = () => {
 
   return (
     <header
-      className={`sticky top-0 z-30 h-16 glass-nav px-4 sm:px-6 flex items-center justify-between transition-all duration-300 ${
-        isCollapsed ? 'md:ml-[80px]' : 'md:ml-[280px]'
-      }`}
+      className={`sticky top-0 z-30 h-16 glass-nav px-4 sm:px-6 flex items-center justify-between transition-all duration-300 ${isCollapsed ? 'md:ml-[80px]' : 'md:ml-[280px]'
+        }`}
     >
       {/* Left Section: Mobile Menu & Welcome Header */}
       <div className="flex items-center gap-3">
@@ -71,7 +70,7 @@ export const TopNav = () => {
         {/* AI Quick Status Badge */}
         <Badge variant="secondary" className="hidden lg:inline-flex py-1 px-2.5">
           <Sparkles className="w-3.5 h-3.5 text-[#2563EB]" />
-          <span>Gemini 3.6 Active</span>
+          <span>AI Optimization Active</span>
         </Badge>
 
         {/* Theme Switcher Menu */}
@@ -97,11 +96,10 @@ export const TopNav = () => {
                   setTheme('light');
                   setShowThemeMenu(false);
                 }}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${
-                  theme === 'light'
-                    ? 'text-[#2563EB] bg-[#2563EB]/10 font-semibold'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-elevated)]'
-                }`}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${theme === 'light'
+                  ? 'text-[#2563EB] bg-[#2563EB]/10 font-semibold'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-elevated)]'
+                  }`}
               >
                 <Sun className="w-4 h-4 text-[#F59E0B]" />
                 <span>Light</span>
@@ -111,11 +109,10 @@ export const TopNav = () => {
                   setTheme('dark');
                   setShowThemeMenu(false);
                 }}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${
-                  theme === 'dark'
-                    ? 'text-[#2563EB] bg-[#2563EB]/10 font-semibold'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-elevated)]'
-                }`}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${theme === 'dark'
+                  ? 'text-[#2563EB] bg-[#2563EB]/10 font-semibold'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-elevated)]'
+                  }`}
               >
                 <Moon className="w-4 h-4 text-[#38BDF8]" />
                 <span>Dark</span>
@@ -125,11 +122,10 @@ export const TopNav = () => {
                   setTheme('system');
                   setShowThemeMenu(false);
                 }}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${
-                  theme === 'system'
-                    ? 'text-[#2563EB] bg-[#2563EB]/10 font-semibold'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-elevated)]'
-                }`}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${theme === 'system'
+                  ? 'text-[#2563EB] bg-[#2563EB]/10 font-semibold'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-elevated)]'
+                  }`}
               >
                 <Monitor className="w-4 h-4 text-[#2563EB]" />
                 <span>System</span>

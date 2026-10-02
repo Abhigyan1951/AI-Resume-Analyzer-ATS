@@ -53,7 +53,7 @@ export const AIRewrite = () => {
         const response = await rewriteWithAI(selectedResumeId, jobDescription);
         if (response.success && response.data) {
           setRewriteData(response.data);
-          toast.success('AI Resume rewrite generated with Google Gemini 3.6!', 'Rewrite Complete');
+          toast.success('AI Resume rewrite generated successfully!', 'Rewrite Complete');
         } else {
           throw new Error(response.message || 'Failed to generate AI rewrite');
         }
@@ -102,7 +102,7 @@ export const AIRewrite = () => {
       {/* Page Header */}
       <PageHeader
         title="AI Resume Rewrite & Enhancement Workspace"
-        subtitle="Transform plain bullet points into high-impact, quantified achievement statements using Google's XYZ formula powered by Gemini 3.6."
+        subtitle="Transform plain bullet points into high-impact, quantified achievement statements using Google's XYZ formula powered by AI."
         badge="Step 3 of 3"
       />
 
@@ -184,7 +184,7 @@ export const AIRewrite = () => {
                     <CardDescription>Tailored for target job description requirements</CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary">Gemini 3.6 Active</Badge>
+                    <Badge variant="secondary">AI Optimization Active</Badge>
                     <Button
                       variant="ghost"
                       size="sm"
